@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --bg-white: #ffffff;
+      --text-black: #111111;
+      --text-muted: #333333;
+      --dark-blue: #0b2545;
+      --dark-blue-hover: #133a6f;
+      --border-color: #e5e7eb;
+      --card-bg: #fafafa;
+    }
+
+    body {
+      background-color: var(--bg-white);
+      color: var(--text-black);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 10px 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Top Section with GIF */
+    .top-hero {
+      text-align: center;
+      padding: 20px 10px 40px 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-gif-container {
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    .header-gif {
+      max-width: 180px;
+      height: auto;
+      border-radius: 50%;
+      border: 3px solid var(--dark-blue);
+      box-shadow: 0 4px 12px rgba(11, 37, 69, 0.15);
+      display: block;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-block;
+      background-color: #f0f4f9;
+      color: var(--dark-blue);
+      border: 1px solid #d2deec;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .top-hero h1 {
+      font-size: 2.2rem;
+      color: var(--dark-blue);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      max-width: 850px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .top-hero p {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 24px auto;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-donate {
+      background-color: var(--dark-blue);
+      color: #ffffff;
+      padding: 12px 30px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+      font-size: 1rem;
+      transition: background-color 0.2s ease;
+    }
+    .btn-donate:hover {
+      background-color: var(--dark-blue-hover);
+    }
+    .btn-outline {
+      border: 2px solid var(--dark-blue);
+      color: var(--dark-blue);
+      padding: 10px 24px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+      font-size: 0.95rem;
+    }
+
+    /* Headings */
+    .section-title {
+      font-size: 1.9rem;
+      color: var(--dark-blue);
+      text-align: center;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      margin-bottom: 35px;
+    }
+
+    /* Key Initiatives */
+    .initiatives {
+      padding: 50px 0;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--dark-blue);
+      border-radius: 6px;
+      padding: 26px 20px;
+    }
+    .card h3 {
+      color: var(--dark-blue);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    /* Photos Section (Click-To-Zoom In Place) */
+    .gallery {
+      padding: 50px 0 60px 0;
+      border-top: 1px solid var(--border-color);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+    .img-box {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ffffff;
+      text-align: center;
+    }
+    .zoom-wrapper {
+      width: 100%;
+      height: 210px;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+    .zoom-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+      user-select: none;
+    }
+    .zoom-wrapper.zoomed img {
+      transform: scale(1.35);
+      cursor: zoom-out;
+    }
+    .img-title {
+      padding: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--dark-blue);
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Registration Strip */
+    .legal-strip {
+      background-color: var(--dark-blue);
+      color: #ffffff;
+      padding: 16px 14px;
+      text-align: center;
+      border-radius: 4px;
+      margin: 10px 0 40px 0;
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 2px solid var(--border-color);
+      padding: 40px 0 20px 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 28px;
+      margin-bottom: 30px;
+    }
+    .footer-col h4 {
+      color: var(--dark-blue);
+      font-size: 1rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .footer-col p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+    .footer-col a {
+      color: var(--dark-blue);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .copyright {
+      text-align: center;
+      color: #777777;
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .top-hero h1 { font-size: 1.75rem; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .header-gif { max-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Hero Section with GIF & Donate -->
+  <section class="top-hero">
+    <div class="container">
+      
+      <!-- Provided GIF in Header -->
+      <div class="header-gif-container">
+        <img 
+          src="https://www.image2url.com/r2/default/gifs/1791832453582-2260cf4d-d19f-4b05-87f6-7b353e5f7134.gif" 
+          alt="Shravan Kumar Care Foundation" 
+          class="header-gif" 
+        />
+      </div>
+
+      <div>
+        <span class="badge">Government Registered Non-Profit Organization</span>
+      </div>
+
+      <h1>Shravan Kumar Mother Father's Care Foundation</h1>
+      <p>
+        Dedicated to providing unconditional healthcare support, daily nutrition, and dignified shelter to elderly parents and seniors in need.
+      </p>
+
+      <div class="btn-group">
+        <a href="mailto:shravanfoundation2026@gmail.com?subject=Donation%20Support" class="btn-donate">Donate Now</a>
+        <a href="#initiatives" class="btn-outline">Our Initiatives</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Key Initiatives -->
+  <section class="initiatives" id="initiatives">
+    <div class="container">
+      <h2 class="section-title">What We Do</h2>
+      <p class="section-subtitle">Dedicated community-first programs focused strictly on elderly well-being</p>
+      
+      <div class="cards-grid">
+        <div class="card">
+          <h3>Elder Healthcare Support</h3>
+          <p>Facilitating routine medical checkups, essential prescription support, and health monitoring for vulnerable seniors.</p>
+        </div>
+        <div class="card">
+          <h3>Dignified Living & Shelter</h3>
+          <p>Ensuring neglected and underprivileged elders find safe surroundings, warmth, nutrition, and companionship.</p>
+        </div>
+        <div class="card">
+          <h3>Social & Emotional Care</h3>
+          <p>Building volunteer networks that spend dedicated time with seniors, mitigating loneliness and depression.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo Gallery (4 Photos, In-Place Click to Zoom) -->
+  <section class="gallery">
+    <div class="container">
+      <h2 class="section-title">Field Work & Impact</h2>
+      <p class="section-subtitle">Click on any photo to zoom in</p>
+      
+      <div class="gallery-grid">
+        <!-- Photo 1 -->
+        <div class="img-box">
+          <div class="zoom-wrapper" onclick="toggleZoom(this)">
+            <img src="https://images.unsplash.com/photo-1516307365426-bea591f05011?auto=format&fit=crop&w=600&q=80" alt="Healthcare Drive" />
+          </div>
+          <div class="img-title">Elder Healthcare Checkup</div>
+        </div>
+
+        <!-- Photo 2 -->
+        <div class="img-box">
+          <div class="zoom-wrapper" onclick="toggleZoom(this)">
+            <img src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80" alt="Nutritional Care" />
+          </div>
+          <div class="img-title">Nutritional Aid Distribution</div>
+        </div>
+
+        <!-- Photo 3 -->
+        <div class="img-box">
+          <div class="zoom-wrapper" onclick="toggleZoom(this)">
+            <img src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80" alt="Companionship" />
+          </div>
+          <div class="img-title">Care & Emotional Support</div>
+        </div>
+
+        <!-- Photo 4 -->
+        <div class="img-box">
+          <div class="zoom-wrapper" onclick="toggleZoom(this)">
+            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80" alt="Volunteer Work" />
+          </div>
+          <div class="img-title">Community Volunteer Drives</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Legal Credentials Strip -->
+  <div class="container">
+    <div class="legal-strip">
+      Govt. Registered Non-Profit | <strong>CIN: U88900DC2026NPL474233</strong> | Registered with ROC Delhi II
+    </div>
+  </div>
+
+  <!-- Bottom Details & Verification -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Shravan Kumar Mother Father's Care Foundation</h4>
+          <p>A registered non-profit organization dedicated to the service, healthcare, and dignified welfare of elderly parents and seniors.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Registered Office</h4>
+          <p>2138, Ganeshpura, Tri Nagar,</p>
+          <p>North West Delhi, Delhi - 110035, India</p>
+        </div>
+        <div class="footer-col">
+          <h4>Contact & Verification</h4>
+          <p><a href="mailto:shravanfoundation2026@gmail.com">shravanfoundation2026@gmail.com</a></p>
+          <p>Contact No: 9395005657</p>
+        </div>
+      </div>
+      <div class="copyright">
+        &copy; 2026 Shravan Kumar Mother Father's Care Foundation. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Simple In-Place Zoom Toggle Script -->
+  <script>
+    function toggleZoom(box) {
+      box.classList.toggle('zoomed');
+    }
+  </script>
+
+</body>
+</html>
