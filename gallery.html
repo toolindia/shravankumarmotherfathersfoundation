@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Creation Social Justice Welfare Society</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF8F5;
+        }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon-dark { background-color: #630019; }
+        .border-maroon { border-color: #800020; }
+
+        /* Smooth Staggered Entrance Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-card {
+            animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Aspect ratio container */
+        .image-card {
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .image-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 28px -8px rgba(128, 0, 32, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
+        }
+        .image-card img {
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .image-card:hover img {
+            transform: scale(1.06);
+        }
+    </style>
+</head>
+<body class="text-stone-800 antialiased selection:bg-rose-100 selection:text-maroon">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+
+        <!-- Top Section Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-[#E8DFD5] pb-6">
+            <div class="text-center sm:text-left">
+                <span class="text-xs font-bold text-maroon tracking-wider uppercase bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                    Live Photographic Archive
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-maroon tracking-tight mt-2">
+                    Activities & Field Gallery
+                </h1>
+                <p class="mt-1 text-stone-600 text-xs sm:text-sm">
+                    Photographic documentation of welfare drives, community meetings, and relief campaigns.
+                </p>
+            </div>
+
+            <!-- Admin Access Toggle Button -->
+            <button onclick="openAdminModal()" 
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F4EFEA] border border-[#DFCFC2] text-xs font-semibold text-maroon hover:bg-[#EADFD5] transition shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>Admin Upload</span>
+            </button>
+        </div>
+
+        <!-- Hidden Admin Control Panel (Visible Only When Logged In with 2026) -->
+        <div id="adminPanel" class="hidden bg-[#FDFBF7] border-2 border-dashed border-maroon/30 rounded-3xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#E8DFD5] pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-maroon flex items-center gap-2">
+                        <span>🔒</span> Admin Upload Management
+                    </h2>
+                    <p class="text-xs text-stone-600 mt-0.5">Use the official ImgBB upload widget or paste a direct image URL.</p>
+                </div>
+                <button onclick="logoutAdmin()" class="text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition">
+                    Logout Admin
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- ImgBB Direct Embed Plugin -->
+                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col items-center text-center">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Upload via ImgBB Widget</h3>
+                    <p class="text-xs text-stone-500 mb-4">Click below to upload images directly to ImgBB storage.</p>
+                    <div id="imgbbWidgetContainer" class="py-2">
+                        <!-- ImgBB Upload Plugin Button -->
+                        <script async src="https://imgbb.com/upload.js"></script>
+                    </div>
+                </div>
+
+                <!-- Instant URL Addition Tool -->
+                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Add Image via Direct URL</h3>
+                    <p class="text-xs text-stone-500 mb-3">Paste any direct image URL (e.g. from ImgBB) to immediately push it to the gallery.</p>
+                    <div class="flex gap-2">
+                        <input type="url" id="customImageUrl" placeholder="https://i.ibb.co/..." 
+                               class="flex-grow px-3 py-2 text-xs bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon">
+                        <button onclick="addNewImageFromUrl()" 
+                                class="px-4 py-2 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition flex-shrink-0">
+                            Add to Live
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Photo Gallery Grid (Pure Clean Images, No Numbers or Text) -->
+        <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-5">
+            <!-- Images are injected dynamically via JavaScript below -->
+        </div>
+
+        <!-- Registered Office Mini-Footer -->
+        <div class="text-center text-xs text-stone-500 border-t border-[#E8DFD5] pt-6">
+            Creation Social Justice Welfare Society | Regd. No. S-1300/2018 | Mandoli, North East Delhi
+        </div>
+
+    </div>
+
+    <!-- Admin Authentication Modal (Password: 2026) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#FAF8F5] border border-[#DFCFC2] rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-rose-50 text-maroon rounded-2xl border border-rose-100 flex items-center justify-center mx-auto text-xl font-bold">
+                    🔑
+                </div>
+                <h3 class="text-lg font-bold text-maroon mt-3">Admin Portal Verification</h3>
+                <p class="text-xs text-stone-600 mt-1">Please enter the security password to manage gallery uploads.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="adminPassword" placeholder="Enter Password" 
+                           class="w-full px-4 py-2.5 text-sm bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon text-center tracking-widest font-mono">
+                    <p id="passwordError" class="text-red-600 text-xs mt-1.5 hidden text-center font-medium">Incorrect password. Please try again.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminModal()" 
+                            class="w-1/2 py-2 text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="w-1/2 py-2 text-xs font-semibold text-white bg-maroon hover:bg-maroon-dark rounded-xl transition shadow-sm">
+                        Unlock
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fullscreen Interactive Lightbox Modal -->
+    <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox(event)">
+        <!-- Top Toolbar -->
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-center text-white/80 z-10 px-2" onclick="event.stopPropagation()">
+            <span id="lightboxCounter" class="text-xs font-mono tracking-wider bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm"></span>
+            <button onclick="closeLightbox()" class="text-white hover:text-white/70 text-2xl font-light w-8 h-8 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm transition">
+                &times;
+            </button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <button onclick="prevLightboxImage(event)" class="absolute left-3 sm:left-6 text-white text-3xl font-light p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-10">
+            &#8249;
+        </button>
+        <button onclick="nextLightboxImage(event)" class="absolute right-3 sm:right-6 text-white text-3xl font-light p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-10">
+            &#8250;
+        </button>
+
+        <!-- Main Displayed Image -->
+        <div class="max-w-4xl max-h-[85vh] p-2 flex items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightboxImage" src="" alt="Gallery Preview" class="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl transition duration-200">
+        </div>
+    </div>
+
+    <!-- Gallery Script -->
+    <script>
+        // Official Preloaded Image URLs (All 64 Live Records)
+        const initialImages = [
+            "https://i.ibb.co/C5BhV0T4/11111-1-1.png",
+            "https://i.ibb.co/TBJ9zHyV/11111-2-1.png",
+            "https://i.ibb.co/R4s4JmFX/11111-82.png",
+            "https://i.ibb.co/8LT57SjX/11111-81.png",
+            "https://i.ibb.co/mC0JkTRP/11111-80.png",
+            "https://i.ibb.co/VWsYSL3K/11111-79.png",
+            "https://i.ibb.co/dx0KBHX/11111-78.png",
+            "https://i.ibb.co/0jnkCWgb/11111-77.png",
+            "https://i.ibb.co/wr6hvZpC/11111-76.png",
+            "https://i.ibb.co/r2zcp445/11111-75.png",
+            "https://i.ibb.co/G3Mm64TX/11111-74.png",
+            "https://i.ibb.co/hJ0dSCfp/11111-73.png",
+            "https://i.ibb.co/pvPYnkQb/11111-72.png",
+            "https://i.ibb.co/zVVPmGjY/11111-71.png",
+            "https://i.ibb.co/Zzg9JRBK/11111-70.png",
+            "https://i.ibb.co/gLzW06vx/11111-69.png",
+            "https://i.ibb.co/qMZPCg7y/11111-68.png",
+            "https://i.ibb.co/r2nKYX3R/11111-67.png",
+            "https://i.ibb.co/jZVc5tkH/11111-66.png",
+            "https://i.ibb.co/Y7LWXmS5/11111-65.png",
+            "https://i.ibb.co/qYR2gkSc/11111-64.png",
+            "https://i.ibb.co/tMMwJz2K/11111-63.png",
+            "https://i.ibb.co/0VpYP2nG/11111-62.png",
+            "https://i.ibb.co/3YNSnmWR/11111-61.png",
+            "https://i.ibb.co/wZKNYD3L/11111-60.png",
+            "https://i.ibb.co/TxWSs9SX/11111-59.png",
+            "https://i.ibb.co/Fq7gtPR0/11111-58.png",
+            "https://i.ibb.co/GfMyTwJG/11111-57.png",
+            "https://i.ibb.co/bRJmF5fB/11111-56.png",
+            "https://i.ibb.co/nqTvbV7t/11111-55.png",
+            "https://i.ibb.co/CsnMKpkq/11111-54.png",
+            "https://i.ibb.co/NdXBSJfM/11111-53.png",
+            "https://i.ibb.co/0jyH5BCK/11111-52.png",
+            "https://i.ibb.co/23Mw1dyK/11111-51.png",
+            "https://i.ibb.co/4ZKyV1tm/11111-50.png",
+            "https://i.ibb.co/vCfQr4cL/11111-49.png",
+            "https://i.ibb.co/kVt4HHSF/11111-48.png",
+            "https://i.ibb.co/VcPk4FqH/11111-47.png",
+            "https://i.ibb.co/xtTfQ9rm/11111-46.png",
+            "https://i.ibb.co/C3jX9BGS/11111-45.png",
+            "https://i.ibb.co/CpZmJ1xh/11111-44.png",
+            "https://i.ibb.co/HfmwDY7K/11111-43.png",
+            "https://i.ibb.co/Y7SFyWwR/11111-42.png",
+            "https://i.ibb.co/nNDpG7Np/11111-41.png",
+            "https://i.ibb.co/4nGMYWfm/11111-40.png",
+            "https://i.ibb.co/vCv8pzK2/11111-39.png",
+            "https://i.ibb.co/YF3tNstg/11111-38.png",
+            "https://i.ibb.co/chQMzRzD/11111-37.png",
+            "https://i.ibb.co/CsH8m15s/11111-36.png",
+            "https://i.ibb.co/RT6vB0c1/11111-35.png",
+            "https://i.ibb.co/fYL0H5ns/11111-34.png",
+            "https://i.ibb.co/Z1N4H63b/11111-33.png",
+            "https://i.ibb.co/hF44hPQf/11111-32.png",
+            "https://i.ibb.co/Vp5ZRYJ6/11111-31.png",
+            "https://i.ibb.co/TxQyM5XC/11111-30.png",
+            "https://i.ibb.co/wZQ6j84h/11111-29.png",
+            "https://i.ibb.co/Pv0m29y1/11111-28.png",
+            "https://i.ibb.co/vvmQSSzP/11111-27.png",
+            "https://i.ibb.co/yFpG1SKM/11111-26.png",
+            "https://i.ibb.co/DfLxT3Fz/11111-25.png",
+            "https://i.ibb.co/d4V3C8qr/11111-24.png",
+            "https://i.ibb.co/XfR7nBX4/11111-23.png",
+            "https://i.ibb.co/SDcBT1V8/11111-22.png",
+            "https://i.ibb.co/6R9JgKcp/11111-21.png",
+            "https://i.ibb.co/RpCqtQWS/11111-20.png",
+            "https://i.ibb.co/1tRX8rSj/11111-19.png",
+            "https://i.ibb.co/mCybshqr/11111-18.png",
+            "https://i.ibb.co/V0TnZdbw/11111-17.png",
+            "https://i.ibb.co/Kjd72hd1/11111-16.png",
+            "https://i.ibb.co/XxjcVVvb/11111-15.png",
+            "https://i.ibb.co/4Zf6rcPD/11111-14.png",
+            "https://i.ibb.co/PsC4Q2Dn/11111-13.png",
+            "https://i.ibb.co/nsjrvq0F/11111-12.png",
+            "https://i.ibb.co/zvz0TH6/11111-11.png",
+            "https://i.ibb.co/fYm2RG7H/11111-10.png",
+            "https://i.ibb.co/6R5TYdDZ/11111-9.png",
+            "https://i.ibb.co/23K4b530/11111-8.png",
+            "https://i.ibb.co/VYNwCQBk/11111-7.png",
+            "https://i.ibb.co/qMZdGdxV/11111-6.png",
+            "https://i.ibb.co/vx63dw79/11111-5.png",
+            "https://i.ibb.co/gM1G104X/11111-4.png",
+            "https://i.ibb.co/Z1HjDQ5Z/11111-3.png",
+            "https://i.ibb.co/m5g4k8fY/11111-2.png",
+            "https://i.ibb.co/Z6QhCz21/11111-1.png"
+        ];
+
+        // Retrieve any admin uploaded URLs stored in localStorage
+        let storedCustomImages = JSON.parse(localStorage.getItem('csjws_custom_gallery') || '[]');
+        let allGalleryImages = [...storedCustomImages, ...initialImages];
+
+        let activeLightboxIndex = 0;
+
+        // Render Gallery Without Any Text or Titles
+        function renderGallery() {
+            const container = document.getElementById('galleryGrid');
+            container.innerHTML = '';
+
+            allGalleryImages.forEach((imgUrl, index) => {
+                const card = document.createElement('div');
+                card.className = "image-card animate-card relative rounded-2xl overflow-hidden bg-[#FDFBF7] border border-[#E8DFD5] shadow-sm cursor-pointer group";
+                card.style.animationDelay = `${Math.min(index * 25, 600)}ms`;
+                card.onclick = () => openLightbox(index);
+
+                card.innerHTML = `
+                    <div class="aspect-square overflow-hidden bg-[#EFE6DC] relative">
+                        <img src="${imgUrl}" 
+                             alt="Society Activity" 
+                             loading="lazy" 
+                             class="w-full h-full object-cover">
+                        <!-- Elegant hover overlay with zoom icon -->
+                        <div class="absolute inset-0 bg-maroon/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="w-9 h-9 rounded-full bg-white/90 text-maroon flex items-center justify-center text-sm shadow-md transform scale-75 group-hover:scale-100 transition duration-300">
+                                🔍
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Lightbox Functions
+        function openLightbox(index) {
+            activeLightboxIndex = index;
+            updateLightboxView();
+            document.getElementById('lightboxModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('lightboxModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateLightboxView() {
+            const img = document.getElementById('lightboxImage');
+            const counter = document.getElementById('lightboxCounter');
+            
+            img.src = allGalleryImages[activeLightboxIndex];
+            counter.innerText = `${activeLightboxIndex + 1} / ${allGalleryImages.length}`;
+        }
+
+        function nextLightboxImage(e) {
+            if (e) e.stopPropagation();
+            activeLightboxIndex = (activeLightboxIndex + 1) % allGalleryImages.length;
+            updateLightboxView();
+        }
+
+        function prevLightboxImage(e) {
+            if (e) e.stopPropagation();
+            activeLightboxIndex = (activeLightboxIndex - 1 + allGalleryImages.length) % allGalleryImages.length;
+            updateLightboxView();
+        }
+
+        // Keyboard navigation for lightbox
+        window.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightboxModal');
+            if (!modal.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') nextLightboxImage();
+                if (e.key === 'ArrowLeft') prevLightboxImage();
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        // Admin Security (Password: 2026)
+        function openAdminModal() {
+            if (sessionStorage.getItem('csjws_admin_auth') === 'true') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('passwordError').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPassword').value;
+            if (pass === '2026') {
+                sessionStorage.setItem('csjws_admin_auth', 'true');
+                closeAdminModal();
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                document.getElementById('passwordError').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('csjws_admin_auth');
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+
+        // Add Image via Direct URL
+        function addNewImageFromUrl() {
+            const input = document.getElementById('customImageUrl');
+            const url = input.value.trim();
+
+            if (!url) return;
+
+            // Prepend new image to maintain newest-first order
+            storedCustomImages.unshift(url);
+            localStorage.setItem('csjws_custom_gallery', JSON.stringify(storedCustomImages));
+
+            allGalleryImages.unshift(url);
+            renderGallery();
+
+            input.value = '';
+            alert('Image added successfully to the live gallery!');
+        }
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGallery();
+            if (sessionStorage.getItem('csjws_admin_auth') === 'true') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            }
+        });
+    </script>
+
+</body>
+</html>
