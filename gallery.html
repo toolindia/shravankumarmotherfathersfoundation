@@ -200,93 +200,8 @@
     <script>
         const IMGBB_API_KEY = "e20298f7b9b94d90992a037d1b78c121";
 
-        // Official Preloaded Image URLs (All 64 Live Records)
-        const initialImages = [
-            "https://i.ibb.co/C5BhV0T4/11111-1-1.png",
-            "https://i.ibb.co/TBJ9zHyV/11111-2-1.png",
-            "https://i.ibb.co/R4s4JmFX/11111-82.png",
-            "https://i.ibb.co/8LT57SjX/11111-81.png",
-            "https://i.ibb.co/mC0JkTRP/11111-80.png",
-            "https://i.ibb.co/VWsYSL3K/11111-79.png",
-            "https://i.ibb.co/dx0KBHX/11111-78.png",
-            "https://i.ibb.co/0jnkCWgb/11111-77.png",
-            "https://i.ibb.co/wr6hvZpC/11111-76.png",
-            "https://i.ibb.co/r2zcp445/11111-75.png",
-            "https://i.ibb.co/G3Mm64TX/11111-74.png",
-            "https://i.ibb.co/hJ0dSCfp/11111-73.png",
-            "https://i.ibb.co/pvPYnkQb/11111-72.png",
-            "https://i.ibb.co/zVVPmGjY/11111-71.png",
-            "https://i.ibb.co/Zzg9JRBK/11111-70.png",
-            "https://i.ibb.co/gLzW06vx/11111-69.png",
-            "https://i.ibb.co/qMZPCg7y/11111-68.png",
-            "https://i.ibb.co/r2nKYX3R/11111-67.png",
-            "https://i.ibb.co/jZVc5tkH/11111-66.png",
-            "https://i.ibb.co/Y7LWXmS5/11111-65.png",
-            "https://i.ibb.co/qYR2gkSc/11111-64.png",
-            "https://i.ibb.co/tMMwJz2K/11111-63.png",
-            "https://i.ibb.co/0VpYP2nG/11111-62.png",
-            "https://i.ibb.co/3YNSnmWR/11111-61.png",
-            "https://i.ibb.co/wZKNYD3L/11111-60.png",
-            "https://i.ibb.co/TxWSs9SX/11111-59.png",
-            "https://i.ibb.co/Fq7gtPR0/11111-58.png",
-            "https://i.ibb.co/GfMyTwJG/11111-57.png",
-            "https://i.ibb.co/bRJmF5fB/11111-56.png",
-            "https://i.ibb.co/nqTvbV7t/11111-55.png",
-            "https://i.ibb.co/CsnMKpkq/11111-54.png",
-            "https://i.ibb.co/NdXBSJfM/11111-53.png",
-            "https://i.ibb.co/0jyH5BCK/11111-52.png",
-            "https://i.ibb.co/23Mw1dyK/11111-51.png",
-            "https://i.ibb.co/4ZKyV1tm/11111-50.png",
-            "https://i.ibb.co/vCfQr4cL/11111-49.png",
-            "https://i.ibb.co/kVt4HHSF/11111-48.png",
-            "https://i.ibb.co/VcPk4FqH/11111-47.png",
-            "https://i.ibb.co/xtTfQ9rm/11111-46.png",
-            "https://i.ibb.co/C3jX9BGS/11111-45.png",
-            "https://i.ibb.co/CpZmJ1xh/11111-44.png",
-            "https://i.ibb.co/HfmwDY7K/11111-43.png",
-            "https://i.ibb.co/Y7SFyWwR/11111-42.png",
-            "https://i.ibb.co/nNDpG7Np/11111-41.png",
-            "https://i.ibb.co/4nGMYWfm/11111-40.png",
-            "https://i.ibb.co/vCv8pzK2/11111-39.png",
-            "https://i.ibb.co/YF3tNstg/11111-38.png",
-            "https://i.ibb.co/chQMzRzD/11111-37.png",
-            "https://i.ibb.co/CsH8m15s/11111-36.png",
-            "https://i.ibb.co/RT6vB0c1/11111-35.png",
-            "https://i.ibb.co/fYL0H5ns/11111-34.png",
-            "https://i.ibb.co/Z1N4H63b/11111-33.png",
-            "https://i.ibb.co/hF44hPQf/11111-32.png",
-            "https://i.ibb.co/Vp5ZRYJ6/11111-31.png",
-            "https://i.ibb.co/TxQyM5XC/11111-30.png",
-            "https://i.ibb.co/wZQ6j84h/11111-29.png",
-            "https://i.ibb.co/Pv0m29y1/11111-28.png",
-            "https://i.ibb.co/vvmQSSzP/11111-27.png",
-            "https://i.ibb.co/yFpG1SKM/11111-26.png",
-            "https://i.ibb.co/DfLxT3Fz/11111-25.png",
-            "https://i.ibb.co/d4V3C8qr/11111-24.png",
-            "https://i.ibb.co/XfR7nBX4/11111-23.png",
-            "https://i.ibb.co/SDcBT1V8/11111-22.png",
-            "https://i.ibb.co/6R9JgKcp/11111-21.png",
-            "https://i.ibb.co/RpCqtQWS/11111-20.png",
-            "https://i.ibb.co/1tRX8rSj/11111-19.png",
-            "https://i.ibb.co/mCybshqr/11111-18.png",
-            "https://i.ibb.co/V0TnZdbw/11111-17.png",
-            "https://i.ibb.co/Kjd72hd1/11111-16.png",
-            "https://i.ibb.co/XxjcVVvb/11111-15.png",
-            "https://i.ibb.co/4Zf6rcPD/11111-14.png",
-            "https://i.ibb.co/PsC4Q2Dn/11111-13.png",
-            "https://i.ibb.co/nsjrvq0F/11111-12.png",
-            "https://i.ibb.co/zvz0TH6/11111-11.png",
-            "https://i.ibb.co/fYm2RG7H/11111-10.png",
-            "https://i.ibb.co/6R5TYdDZ/11111-9.png",
-            "https://i.ibb.co/23K4b530/11111-8.png",
-            "https://i.ibb.co/VYNwCQBk/11111-7.png",
-            "https://i.ibb.co/qMZdGdxV/11111-6.png",
-            "https://i.ibb.co/vx63dw79/11111-5.png",
-            "https://i.ibb.co/gM1G104X/11111-4.png",
-            "https://i.ibb.co/Z1HjDQ5Z/11111-3.png",
-            "https://i.ibb.co/m5g4k8fY/11111-2.png",
-            "https://i.ibb.co/Z6QhCz21/11111-1.png"
-        ];
+        // Removed all default preloaded images
+        const initialImages = [];
 
         // Retrieve any admin uploaded URLs stored in localStorage
         let storedCustomImages = JSON.parse(localStorage.getItem('csjws_custom_gallery') || '[]');
@@ -298,6 +213,11 @@
         function renderGallery() {
             const container = document.getElementById('galleryGrid');
             container.innerHTML = '';
+            
+            if (allGalleryImages.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm">No images uploaded yet.</div>';
+                return;
+            }
 
             allGalleryImages.forEach((imgUrl, index) => {
                 const card = document.createElement('div');
