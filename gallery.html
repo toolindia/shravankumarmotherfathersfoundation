@@ -18,14 +18,8 @@
         .border-maroon { border-color: #800020; }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(18px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .animate-card {
@@ -82,7 +76,7 @@
                     <h2 class="text-lg font-bold text-maroon flex items-center gap-2">
                         <span>🔒</span> Admin Upload Management
                     </h2>
-                    <p class="text-xs text-stone-600 mt-0.5">Upload images directly using the ImgBB Cloud API integration.</p>
+                    <p class="text-xs text-stone-600 mt-0.5">Upload images directly to Google Drive & Google Sheets.</p>
                 </div>
                 <button onclick="logoutAdmin()" class="text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition">
                     Logout Admin
@@ -90,17 +84,17 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                <!-- Direct ImgBB API File Upload -->
+                <!-- Direct Google Drive Upload -->
                 <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Upload Image File (ImgBB API)</h3>
-                        <p class="text-xs text-stone-500 mb-4">Choose an image from your device to upload directly to ImgBB.</p>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Upload Image File</h3>
+                        <p class="text-xs text-stone-500 mb-4">Select an image to securely save it to your Google Drive folder.</p>
                         
                         <div class="space-y-3">
                             <input type="file" id="imageFileInput" accept="image/*" 
                                    class="block w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#F4EFEA] file:text-maroon hover:file:bg-[#EADFD5] file:cursor-pointer">
                             
-                            <button id="uploadBtn" onclick="uploadViaImgbbApi()" 
+                            <button id="uploadBtn" onclick="uploadToGoogleDrive()" 
                                     class="w-full py-2.5 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition shadow-sm flex items-center justify-center gap-2">
                                 <span id="uploadBtnText">Upload Image</span>
                                 <div id="uploadSpinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></div>
@@ -116,7 +110,7 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Add via Direct URL</h3>
                         <p class="text-xs text-stone-500 mb-3">Paste any direct image URL link to immediately add it to the live feed.</p>
                         <div class="flex flex-col sm:flex-row gap-2 mt-4">
-                            <input type="url" id="customImageUrl" placeholder="https://i.ibb.co/..." 
+                            <input type="url" id="customImageUrl" placeholder="https://example.com/image.jpg" 
                                    class="flex-grow px-3 py-2 text-xs bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon">
                             <button onclick="addNewImageFromUrl()" 
                                     class="px-4 py-2 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition flex-shrink-0">
@@ -124,14 +118,14 @@
                             </button>
                         </div>
                     </div>
-                    <span class="text-[11px] text-stone-400 mt-4 block">Newly added images are automatically saved and shown on top.</span>
+                    <span class="text-[11px] text-stone-400 mt-4 block">Newly added URL images are stored locally in the browser.</span>
                 </div>
             </div>
         </div>
 
-        <!-- Live Photo Gallery Grid (Pure Clean Images, No Numbers or Text) -->
+        <!-- Live Photo Gallery Grid -->
         <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-5">
-            <!-- Images are injected dynamically via JavaScript below -->
+            <!-- Images will load here automatically -->
         </div>
 
         <!-- Registered Office Mini-Footer -->
@@ -198,24 +192,20 @@
 
     <!-- Gallery Script -->
     <script>
-        const IMGBB_API_KEY = "e20298f7b9b94d90992a037d1b78c121";
+        // Aapka naya Google Apps Script Web App URL
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiKJymtVR4POrAB1g5knvjchQtwHDD_2De9O1yEfWwo6BPs1WEg3rb2WGeBnhjQmerSg/exec";
 
-        // Removed all default preloaded images
-        const initialImages = [];
-
-        // Retrieve any admin uploaded URLs stored in localStorage
         let storedCustomImages = JSON.parse(localStorage.getItem('csjws_custom_gallery') || '[]');
-        let allGalleryImages = [...storedCustomImages, ...initialImages];
-
+        let allGalleryImages = [];
         let activeLightboxIndex = 0;
 
-        // Render Gallery Without Any Text or Titles
+        // Render Gallery
         function renderGallery() {
             const container = document.getElementById('galleryGrid');
             container.innerHTML = '';
             
             if (allGalleryImages.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm">No images uploaded yet.</div>';
+                container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm">No images found in the gallery.</div>';
                 return;
             }
 
@@ -242,8 +232,28 @@
             });
         }
 
-        // Upload directly via ImgBB API v1
-        async function uploadViaImgbbApi() {
+        // Fetch Images from Google Sheet
+        async function fetchImagesFromSheet() {
+            const container = document.getElementById('galleryGrid');
+            container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm flex flex-col items-center gap-3"><div class="w-6 h-6 border-2 border-maroon border-t-transparent rounded-full animate-spin"></div>Loading Images from Server...</div>';
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+                
+                // Combine manual local URLs with Google Sheet URLs
+                allGalleryImages = [...storedCustomImages, ...data];
+                renderGallery();
+            } catch (error) {
+                console.error("Failed to load images:", error);
+                // If fetch fails, show at least the local manual images
+                allGalleryImages = [...storedCustomImages];
+                renderGallery();
+            }
+        }
+
+        // Upload securely via Google Apps Script (Base64)
+        function uploadToGoogleDrive() {
             const fileInput = document.getElementById('imageFileInput');
             const file = fileInput.files[0];
             const statusBox = document.getElementById('uploadStatusMessage');
@@ -259,46 +269,51 @@
 
             // Set loading state
             uploadBtn.disabled = true;
-            uploadBtnText.innerText = "Uploading...";
+            uploadBtnText.innerText = "Saving to Drive...";
             uploadSpinner.classList.remove('hidden');
             statusBox.className = "mt-3 text-xs text-center text-stone-600 block";
-            statusBox.innerText = "Uploading to ImgBB...";
+            statusBox.innerText = "Encoding image for secure upload...";
 
-            try {
-                const formData = new FormData();
-                formData.append('image', file);
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const base64String = reader.result;
+                statusBox.innerText = "Uploading to Google Drive & Sheet...";
 
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            name: file.name,
+                            type: file.type,
+                            base64: base64String
+                        })
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (data && data.success && data.data && data.data.url) {
-                    const uploadedUrl = data.data.url;
-                    
-                    // Add to custom images at the beginning
-                    storedCustomImages.unshift(uploadedUrl);
-                    localStorage.setItem('csjws_custom_gallery', JSON.stringify(storedCustomImages));
+                    if (data && data.success) {
+                        const uploadedUrl = data.url;
+                        
+                        allGalleryImages.unshift(uploadedUrl);
+                        renderGallery();
 
-                    allGalleryImages.unshift(uploadedUrl);
-                    renderGallery();
-
-                    statusBox.className = "mt-3 text-xs text-center text-emerald-700 font-medium block";
-                    statusBox.innerText = "Image uploaded and added to the gallery successfully!";
-                    fileInput.value = '';
-                } else {
-                    throw new Error(data.error ? data.error.message : 'Upload failed');
+                        statusBox.className = "mt-3 text-xs text-center text-emerald-700 font-medium block";
+                        statusBox.innerText = "Image successfully saved to Drive & Sheet!";
+                        fileInput.value = '';
+                    } else {
+                        throw new Error(data.error || 'Upload failed');
+                    }
+                } catch (err) {
+                    statusBox.className = "mt-3 text-xs text-center text-red-600 block";
+                    statusBox.innerText = "Upload failed: " + err.message;
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtnText.innerText = "Upload Image";
+                    uploadSpinner.classList.add('hidden');
                 }
-            } catch (err) {
-                statusBox.className = "mt-3 text-xs text-center text-red-600 block";
-                statusBox.innerText = "Upload failed: " + err.message;
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtnText.innerText = "Upload Image";
-                uploadSpinner.classList.add('hidden');
-            }
+            };
+            
+            reader.readAsDataURL(file);
         }
 
         // Lightbox Functions
@@ -398,7 +413,8 @@
 
         // Initialize on Load
         document.addEventListener('DOMContentLoaded', () => {
-            renderGallery();
+            fetchImagesFromSheet(); // Load images automatically from Apps Script
+            
             if (sessionStorage.getItem('csjws_admin_auth') === 'true') {
                 document.getElementById('adminPanel').classList.remove('hidden');
             }
