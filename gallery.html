@@ -1,54 +1,426 @@
-var SHEET_NAME = "GalleryData";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Creation Social Justice Welfare Society</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF8F5;
+        }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon-dark { background-color: #630019; }
+        .border-maroon { border-color: #800020; }
 
-function setupSheet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME);
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(18px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
-  }
+        .animate-card {
+            animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
-  var headers = sheet.getRange(1, 1, 1, 3).getValues()[0];
-  if (headers[0] !== "Date" || headers[1] !== "Base64 Image Data" || headers[2] !== "File Name") {
-    sheet.getRange(1, 1, 1, 3).setValues([["Date", "Base64 Image Data", "File Name"]]);
-    sheet.getRange(1, 1, 1, 3).setFontWeight("bold");
-    sheet.setFrozenRows(1); 
-  }
+        .image-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .image-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -6px rgba(128, 0, 32, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+        }
+        .image-card img {
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .image-card:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="text-stone-800 antialiased selection:bg-rose-100 selection:text-maroon">
 
-  return sheet;
-}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
 
-function doPost(e) {
-  try {
-    var params = JSON.parse(e.postData.contents);
-    var sheet = setupSheet();
-    var dateStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss");
-    
-    // Save Base64 directly into the sheet (No Drive used)
-    sheet.appendRow([dateStr, params.base64, params.name]);
-    
-    return ContentService.createTextOutput(JSON.stringify({"success": true})).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({"success": false, "error": error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-[#E8DFD5] pb-6">
+            <div class="text-center sm:text-left">
+                <span class="text-xs font-bold text-maroon tracking-wider uppercase bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                    Live Photographic Archive
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-maroon tracking-tight mt-2">
+                    Activities & Field Gallery
+                </h1>
+                <p class="mt-1 text-stone-600 text-xs sm:text-sm">
+                    Photographic documentation of welfare drives, community meetings, and relief campaigns.
+                </p>
+            </div>
 
-function doGet(e) {
-  try {
-    var sheet = setupSheet();
-    var data = sheet.getDataRange().getValues();
-    var images = [];
-    
-    // Fetch Base64 data directly from the sheet
-    for(var i = 1; i < data.length; i++) {
-      if(data[i][1]) {
-        images.push(data[i][1]);
-      }
-    }
-    
-    images.reverse(); 
-    return ContentService.createTextOutput(JSON.stringify(images)).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+            <button onclick="openAdminModal()" 
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#F4EFEA] border border-[#DFCFC2] text-xs font-semibold text-maroon hover:bg-[#EADFD5] transition shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>Admin Upload</span>
+            </button>
+        </div>
+
+        <div id="adminPanel" class="hidden bg-[#FDFBF7] border-2 border-dashed border-maroon/30 rounded-3xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#E8DFD5] pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-maroon flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <span>Admin Upload Management</span>
+                    </h2>
+                    <p class="text-xs text-stone-600 mt-0.5">Upload images directly to Google Sheets via Base64.</p>
+                </div>
+                <button onclick="logoutAdmin()" class="text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition">
+                    Logout Admin
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Upload Image File</h3>
+                        <p class="text-xs text-stone-500 mb-4">Image will be compressed automatically to fit Sheet limits.</p>
+                        
+                        <div class="space-y-3">
+                            <input type="file" id="imageFileInput" accept="image/*" 
+                                   class="block w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#F4EFEA] file:text-maroon hover:file:bg-[#EADFD5] file:cursor-pointer">
+                            
+                            <button id="uploadBtn" onclick="uploadDirectToSheet()" 
+                                    class="w-full py-2.5 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition shadow-sm flex items-center justify-center gap-2">
+                                <span id="uploadBtnText">Upload to Sheet</span>
+                                <div id="uploadSpinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></div>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="uploadStatusMessage" class="mt-3 text-xs text-center hidden"></div>
+                </div>
+
+                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Add via Direct URL</h3>
+                        <p class="text-xs text-stone-500 mb-3">Paste any direct image URL link to immediately add it to the live feed.</p>
+                        <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                            <input type="url" id="customImageUrl" placeholder="https://example.com/image.jpg" 
+                                   class="flex-grow px-3 py-2 text-xs bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon">
+                            <button onclick="addNewImageFromUrl()" 
+                                    class="px-4 py-2 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition flex-shrink-0">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                    <span class="text-[11px] text-stone-400 mt-4 block">Newly added URL images are stored locally.</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-5">
+            <!-- Images will load here automatically -->
+        </div>
+
+        <div class="text-center text-xs text-stone-500 border-t border-[#E8DFD5] pt-6">
+            Creation Social Justice Welfare Society | Regd. No. S-1300/2018 | Mandoli, North East Delhi
+        </div>
+
+    </div>
+
+    <div id="adminModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#FAF8F5] border border-[#DFCFC2] rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-rose-50 text-maroon rounded-2xl border border-rose-100 flex items-center justify-center mx-auto text-xl font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-maroon mt-3">Admin Portal Verification</h3>
+                <p class="text-xs text-stone-600 mt-1">Please enter the security password to manage gallery uploads.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="adminPassword" placeholder="Enter Password" 
+                           class="w-full px-4 py-2.5 text-sm bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon text-center tracking-widest font-mono">
+                    <p id="passwordError" class="text-red-600 text-xs mt-1.5 hidden text-center font-medium">Incorrect password. Please try again.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminModal()" 
+                            class="w-1/2 py-2 text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="w-1/2 py-2 text-xs font-semibold text-white bg-maroon hover:bg-maroon-dark rounded-xl transition shadow-sm">
+                        Unlock
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox(event)">
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-center text-white/80 z-10 px-2" onclick="event.stopPropagation()">
+            <span id="lightboxCounter" class="text-xs font-mono tracking-wider bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm"></span>
+            <button onclick="closeLightbox()" class="text-white hover:text-white/70 text-2xl font-light w-8 h-8 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm transition">
+                &times;
+            </button>
+        </div>
+
+        <button onclick="prevLightboxImage(event)" class="absolute left-3 sm:left-6 text-white text-3xl font-light p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-10">
+            &#8249;
+        </button>
+        <button onclick="nextLightboxImage(event)" class="absolute right-3 sm:right-6 text-white text-3xl font-light p-3 rounded-full bg-white/10 hover:bg-white/20 transition z-10">
+            &#8250;
+        </button>
+
+        <div class="max-w-4xl max-h-[85vh] p-2 flex items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightboxImage" src="" alt="Gallery Preview" class="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl transition duration-200">
+        </div>
+    </div>
+
+    <script>
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiKJymtVR4POrAB1g5knvjchQtwHDD_2De9O1yEfWwo6BPs1WEg3rb2WGeBnhjQmerSg/exec";
+
+        let storedCustomImages = JSON.parse(localStorage.getItem('csjws_custom_gallery') || '[]');
+        let allGalleryImages = [];
+        let activeLightboxIndex = 0;
+
+        function renderGallery() {
+            const container = document.getElementById('galleryGrid');
+            container.innerHTML = '';
+            
+            if (allGalleryImages.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm">No images found in the gallery.</div>';
+                return;
+            }
+
+            allGalleryImages.forEach((imgUrl, index) => {
+                const card = document.createElement('div');
+                card.className = "image-card animate-card relative rounded-2xl overflow-hidden bg-[#FDFBF7] border border-[#E8DFD5] shadow-sm cursor-pointer group";
+                card.style.animationDelay = `${Math.min(index * 20, 500)}ms`;
+                card.onclick = () => openLightbox(index);
+
+                card.innerHTML = `
+                    <div class="aspect-square overflow-hidden bg-[#EFE6DC] relative">
+                        <img src="${imgUrl}" 
+                             alt="Society Activity" 
+                             loading="lazy" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-maroon/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="w-9 h-9 rounded-full bg-white/90 text-maroon flex items-center justify-center shadow-md transform scale-75 group-hover:scale-100 transition duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function fetchImagesFromSheet() {
+            const container = document.getElementById('galleryGrid');
+            container.innerHTML = '<div class="col-span-full text-center text-stone-500 py-10 text-sm flex flex-col items-center gap-3"><div class="w-6 h-6 border-2 border-maroon border-t-transparent rounded-full animate-spin"></div>Loading Images from Server...</div>';
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+                
+                allGalleryImages = [...storedCustomImages, ...data];
+                renderGallery();
+            } catch (error) {
+                console.error("Failed to load images:", error);
+                allGalleryImages = [...storedCustomImages];
+                renderGallery();
+            }
+        }
+
+        function uploadDirectToSheet() {
+            const fileInput = document.getElementById('imageFileInput');
+            const file = fileInput.files[0];
+            const statusBox = document.getElementById('uploadStatusMessage');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadBtnText = document.getElementById('uploadBtnText');
+            const uploadSpinner = document.getElementById('uploadSpinner');
+
+            if (!file) {
+                statusBox.className = "mt-3 text-xs text-center text-red-600 block";
+                statusBox.innerText = "Please select an image file first.";
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtnText.innerText = "Processing...";
+            uploadSpinner.classList.remove('hidden');
+            statusBox.className = "mt-3 text-xs text-center text-stone-600 block";
+            statusBox.innerText = "Compressing image to fit Google Sheets limit...";
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = async function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // Compress image so Base64 does not exceed Google Sheet limits
+                    const MAX_SIZE = 450; 
+                    if (width > height && width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    
+                    statusBox.innerText = "Saving Base64 directly to Sheet...";
+
+                    try {
+                        const response = await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                name: file.name,
+                                base64: compressedBase64
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (data && data.success) {
+                            allGalleryImages.unshift(compressedBase64);
+                            renderGallery();
+
+                            statusBox.className = "mt-3 text-xs text-center text-emerald-700 font-medium block";
+                            statusBox.innerText = "Base64 successfully saved directly to Sheet!";
+                            fileInput.value = '';
+                        } else {
+                            throw new Error(data.error || 'Upload failed');
+                        }
+                    } catch (err) {
+                        statusBox.className = "mt-3 text-xs text-center text-red-600 block";
+                        statusBox.innerText = "Upload failed: " + err.message;
+                    } finally {
+                        uploadBtn.disabled = false;
+                        uploadBtnText.innerText = "Upload to Sheet";
+                        uploadSpinner.classList.add('hidden');
+                    }
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openLightbox(index) {
+            activeLightboxIndex = index;
+            updateLightboxView();
+            document.getElementById('lightboxModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('lightboxModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateLightboxView() {
+            const img = document.getElementById('lightboxImage');
+            const counter = document.getElementById('lightboxCounter');
+            
+            img.src = allGalleryImages[activeLightboxIndex];
+            counter.innerText = `${activeLightboxIndex + 1} / ${allGalleryImages.length}`;
+        }
+
+        function nextLightboxImage(e) {
+            if (e) e.stopPropagation();
+            activeLightboxIndex = (activeLightboxIndex + 1) % allGalleryImages.length;
+            updateLightboxView();
+        }
+
+        function prevLightboxImage(e) {
+            if (e) e.stopPropagation();
+            activeLightboxIndex = (activeLightboxIndex - 1 + allGalleryImages.length) % allGalleryImages.length;
+            updateLightboxView();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightboxModal');
+            if (!modal.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') nextLightboxImage();
+                if (e.key === 'ArrowLeft') prevLightboxImage();
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        function openAdminModal() {
+            if (sessionStorage.getItem('csjws_admin_auth') === 'true') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('passwordError').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPassword').value;
+            if (pass === '2026') {
+                sessionStorage.setItem('csjws_admin_auth', 'true');
+                closeAdminModal();
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                document.getElementById('passwordError').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('csjws_admin_auth');
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+
+        function addNewImageFromUrl() {
+            const input = document.getElementById('customImageUrl');
+            const url = input.value.trim();
+
+            if (!url) return;
+
+            storedCustomImages.unshift(url);
+            localStorage.setItem('csjws_custom_gallery', JSON.stringify(storedCustomImages));
+
+            allGalleryImages.unshift(url);
+            renderGallery();
+
+            input.value = '';
+            alert('Image added successfully to the live gallery!');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchImagesFromSheet(); 
+            
+            if (sessionStorage.getItem('csjws_admin_auth') === 'true') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
