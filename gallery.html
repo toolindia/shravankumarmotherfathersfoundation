@@ -82,45 +82,23 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Bulk Upload Image Files</h3>
-                        <p class="text-xs text-stone-500 mb-4">Select one or multiple images. They will be compressed automatically.</p>
-                        
-                        <div class="space-y-3">
-                            <!-- Added "multiple" and "onchange" event for previews -->
-                            <input type="file" id="imageFileInput" accept="image/*" multiple onchange="handleFileSelect(event)"
-                                   class="block w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#F4EFEA] file:text-maroon hover:file:bg-[#EADFD5] file:cursor-pointer">
-                            
-                            <!-- Container for dynamic image previews -->
-                            <div id="previewContainer" class="flex flex-wrap gap-2 mt-2 empty:hidden"></div>
+            <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl max-w-2xl mx-auto">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Bulk Upload Image Files</h3>
+                <p class="text-xs text-stone-500 mb-4">Select one or multiple images. They will be compressed automatically.</p>
+                
+                <div class="space-y-3">
+                    <input type="file" id="imageFileInput" accept="image/*" multiple onchange="handleFileSelect(event)"
+                           class="block w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#F4EFEA] file:text-maroon hover:file:bg-[#EADFD5] file:cursor-pointer">
+                    
+                    <div id="previewContainer" class="flex flex-wrap gap-2 mt-2 empty:hidden"></div>
 
-                            <button id="uploadBtn" onclick="uploadDirectToSheet()" 
-                                    class="w-full py-2.5 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition shadow-sm flex items-center justify-center gap-2">
-                                <span id="uploadBtnText">Upload to Sheet</span>
-                                <div id="uploadSpinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></div>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="uploadStatusMessage" class="mt-3 text-xs text-center hidden"></div>
+                    <button id="uploadBtn" onclick="uploadDirectToSheet()" 
+                            class="w-full py-2.5 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition shadow-sm flex items-center justify-center gap-2">
+                        <span id="uploadBtnText">Upload to Sheet</span>
+                        <div id="uploadSpinner" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin hidden"></div>
+                    </button>
                 </div>
-
-                <div class="bg-[#FAF8F5] border border-[#E8DFD5] p-5 rounded-2xl flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Add via Direct URL</h3>
-                        <p class="text-xs text-stone-500 mb-3">Paste any direct image URL link to immediately add it to the live feed.</p>
-                        <div class="flex flex-col sm:flex-row gap-2 mt-4">
-                            <input type="url" id="customImageUrl" placeholder="https://example.com/image.jpg" 
-                                   class="flex-grow px-3 py-2 text-xs bg-white border border-[#DFCFC2] rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon">
-                            <button onclick="addNewImageFromUrl()" 
-                                    class="px-4 py-2 bg-maroon text-white text-xs font-semibold rounded-xl hover:bg-maroon-dark transition flex-shrink-0">
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                    <span class="text-[11px] text-stone-400 mt-4 block">Newly added URL images are stored locally.</span>
-                </div>
+                <div id="uploadStatusMessage" class="mt-3 text-xs text-center hidden"></div>
             </div>
         </div>
 
@@ -188,8 +166,8 @@
 
     <script>
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiKJymtVR4POrAB1g5knvjchQtwHDD_2De9O1yEfWwo6BPs1WEg3rb2WGeBnhjQmerSg/exec";
-
-        let storedCustomImages = JSON.parse(localStorage.getItem('csjws_custom_gallery') || '[]');
+        
+        // Removed localStorage completely
         let allGalleryImages = [];
         let activeLightboxIndex = 0;
 
@@ -235,16 +213,15 @@
                 const response = await fetch(APPS_SCRIPT_URL);
                 const data = await response.json();
                 
-                allGalleryImages = [...storedCustomImages, ...data];
+                allGalleryImages = data;
                 renderGallery();
             } catch (error) {
                 console.error("Failed to load images:", error);
-                allGalleryImages = [...storedCustomImages];
+                allGalleryImages = [];
                 renderGallery();
             }
         }
 
-        // Generate Thumbnails when files are selected
         function handleFileSelect(event) {
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.innerHTML = ''; 
@@ -263,7 +240,6 @@
             }
         }
 
-        // Promisify the compression function
         function compressImage(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -298,7 +274,6 @@
             });
         }
 
-        // Process and Upload Bulk Images
         async function uploadDirectToSheet() {
             const fileInput = document.getElementById('imageFileInput');
             const files = fileInput.files;
@@ -348,7 +323,6 @@
                 }
             }
 
-            // Upload Loop Finished
             uploadBtn.disabled = false;
             uploadBtnText.innerText = "Upload to Sheet";
             uploadSpinner.classList.add('hidden');
@@ -438,22 +412,6 @@
         function logoutAdmin() {
             sessionStorage.removeItem('csjws_admin_auth');
             document.getElementById('adminPanel').classList.add('hidden');
-        }
-
-        function addNewImageFromUrl() {
-            const input = document.getElementById('customImageUrl');
-            const url = input.value.trim();
-
-            if (!url) return;
-
-            storedCustomImages.unshift(url);
-            localStorage.setItem('csjws_custom_gallery', JSON.stringify(storedCustomImages));
-
-            allGalleryImages.unshift(url);
-            renderGallery();
-
-            input.value = '';
-            alert('Image added successfully to the live gallery!');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
